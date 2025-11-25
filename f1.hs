@@ -105,21 +105,22 @@ safe :: Semaforo -> Semaforo -> Bool
 safe x y | x == Verde && y == Verde = True
          | otherwise = False
 
-data Ponto = Cartesiano Double Double | Polar Double Double deriving (Show,Eq)
+data Ponto1 = Cartesiano Double Double |
+             Polar Double Double deriving (Show,Eq)
 
-posx :: Ponto -> Double
+posx :: Ponto1 -> Double
 posx (Cartesiano x1 y1) = x1
 posx (Polar d a) = d * (cos a)
 
-posy :: Ponto -> Double
+posy :: Ponto1 -> Double
 posy (Cartesiano x1 y1) = y1
 posy (Polar d a) = d + (sin a)
 
-raio :: Ponto -> Double
+raio :: Ponto1 -> Double
 raio (Cartesiano x1 y1) = sqrt (x1^2 + y1^2)
 raio (Polar d a) = d
 
-angulo :: Ponto -> Double
+angulo :: Ponto1 -> Double
 angulo (Cartesiano x1 y1) |x1==0 && y1==0 =0
                           |x1==0 && y1>0 = pi/2
                           |x1==0 && y1<0 = -pi/2
@@ -128,9 +129,9 @@ angulo (Cartesiano x1 y1) |x1==0 && y1==0 =0
                           |x1<0 && y1<0 = atan (y1/x1) - pi
 angulo (Polar d a) = a
 
--(e) dist :: Ponto -> Ponto -> Double que calcula a distância entre dois pontos
+--(e) dist :: Ponto -> Ponto -> Double que calcula a distância entre dois pontos
 
-dist' :: Ponto -> Ponto -> Double
+dist' :: Ponto1 -> Ponto1 -> Double
 dist' (Cartesiano x1 y1) (Cartesiano x2 y2) = sqrt ((x1-x2)^2+(y1-y2)^2)
 dist' (Polar d1 a1) (Polar d2 a2) = sqrt((px1-px2)^2+(py1-py2)^2)
                                    where 
@@ -139,7 +140,7 @@ dist' (Polar d1 a1) (Polar d2 a2) = sqrt((px1-px2)^2+(py1-py2)^2)
                                    py1 = d1 * sin a1
                                    py2 = d2 * sin a2
 
-data Figura = Circulo Ponto Double | Rectangulo Ponto Ponto | Triangulo Ponto Ponto Ponto deriving (Show,Eq)
+data Figura = Circulo Ponto1 Double | Rectangulo Ponto1 Ponto1 | Triangulo Ponto1 Ponto1 Ponto1 deriving (Show,Eq)
 
 
 poligono :: Figura -> Bool
@@ -151,7 +152,7 @@ poligono (Triangulo a b c) = ((x+y)>z) || ((x+z)>y) || ((y+z)>x)
                            y = dist' a c
                            z = dist' b c
 
-vertices :: Figura -> [Ponto]
+vertices :: Figura -> [Ponto1]
 vertices (Circulo a r) = []
 vertices (Rectangulo a b) = [Cartesiano x1 y1, Cartesiano x1 y2, Cartesiano x2 y1, Cartesiano x2 y2]
                             where 
@@ -178,3 +179,28 @@ perimetro' (Triangulo a b c) = let p1 = dist' a b
                                    p3 = dist' c a
                                in  p1 + p2 + p3
 
+--Exercicio 8
+
+isLower' :: Char -> Bool
+isLower' x = ord x >= ord 'a' && ord x <= ord 'z'
+--nem é preciso guardas porque && já devolve o Bool
+
+isDigit' :: Char -> Bool
+isDigit' x = ord x >= ord '0' && ord x <= ord '9'
+--versão extra
+isDigit1' :: Char -> Bool
+isDigit1' x = if elem x ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] then True else False
+
+isAlpha' :: Char -> Bool
+isAlpha' x = if isLower' x || isUpper x then True else False
+
+toUpper' :: Char -> Char
+toUpper' x = if isLower' x then chr (ord x - 32) else x
+
+intToDigit' :: Int -> Char
+intToDigit' x = chr (ord '0' + x)
+
+digitToInt' :: Char -> Int
+digitToInt' x = if isDigit x
+                     then ord x - ord '0'
+                     else error "Not a digit"
