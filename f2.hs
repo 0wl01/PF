@@ -142,3 +142,53 @@ sumTriplos1 = foldl' (\(x,y,z) (a,b,c) -> (x+a, y+b, z+c)) (0,0,0)
 --se usares foldl aqui pode dar stack overflow por exemplo
 
 --Exercicio 3
+
+--a)
+--Versão Recursiva
+soDigitos :: [Char] -> [Char]
+soDigitos [] = []
+soDigitos (h:t) = if isDigit h
+                  then h : isDigit t
+                  else isDigit t
+--Versão Eficiente
+soDigitos1 :: [Char] -> [Char]
+soDigitos1 = filter isDigit --funções de ordem superior é demasiado engraçado
+
+--b)
+--Versão Recursiva
+minusculas :: [Char] -> Int
+minusculas [] = 0
+minusculas (h:t) = if isLower h
+                   then 1 + minusculas t
+                   else minusculas t
+--Versão Eficiente
+minusculas1 :: [Char] -> Int
+minusculas1 = length . filter isLower
+
+--c)
+--Versão Recursiva
+nums :: String -> [Int]
+nums [] = []
+nums (h:t) = if isDigit h
+             then digitToInt h : nums t
+             else nums t
+--Versão Eficiente
+nums1 :: String -> [Int]
+nums1 = map digitToInt . filter isDigit
+
+nums2 :: String -> [Int]
+nums2 = foldl (\c acc -> if isDigit c then digitToInt c : acc else acc) [] 
+--versão usando acumulador
+
+--Exercicio 4
+
+type Polinomio = [Monomio]
+type Monomio = (Float,Int)
+
+--a
+--Versão Recursiva
+conta :: Int -> Polinomio -> Int
+conta m [] = 0
+conta m ((x,n):t) = if m == n
+                  then 1 + conta m t
+                  else conta m t
