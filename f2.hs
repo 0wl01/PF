@@ -1,3 +1,5 @@
+module F2 where
+
 import Data.Char
 import Data.List
 --Ficha 2
@@ -148,8 +150,8 @@ sumTriplos1 = foldl' (\(x,y,z) (a,b,c) -> (x+a, y+b, z+c)) (0,0,0)
 soDigitos :: [Char] -> [Char]
 soDigitos [] = []
 soDigitos (h:t) = if isDigit h
-                  then h : isDigit t
-                  else isDigit t
+                  then h : soDigitos t
+                  else soDigitos t
 --Versão Eficiente
 soDigitos1 :: [Char] -> [Char]
 soDigitos1 = filter isDigit --funções de ordem superior é demasiado engraçado
@@ -177,7 +179,7 @@ nums1 :: String -> [Int]
 nums1 = map digitToInt . filter isDigit
 
 nums2 :: String -> [Int]
-nums2 = foldl (\c acc -> if isDigit c then digitToInt c : acc else acc) [] 
+nums2 = foldl (\acc c -> if isDigit c then digitToInt c : acc else acc) [] 
 --versão usando acumulador
 
 --Exercicio 4
@@ -189,6 +191,37 @@ type Monomio = (Float,Int)
 --Versão Recursiva
 conta :: Int -> Polinomio -> Int
 conta m [] = 0
-conta m ((x,n):t) = if m == n
+conta m ((_,n):t) = if m == n
                   then 1 + conta m t
                   else conta m t
+--Versão Eficiente
+conta1 :: Int -> Polinomio -> Int
+conta1 x l = length (filter (\(_, n) -> n == x) l)
+
+--b
+--Versão Recursiva
+grau :: Polinomio -> Int
+grau [] = 0
+grau [(x,n)] = n
+grau ((x1,n1):(x2,n2):t) = 
+    if n1 < n2 
+        then grau ((x2,n2):t)
+        else grau ((x1,n1):t)
+--Versão Eficiente
+grau1 :: Polinomio -> Int
+grau1 p = foldl maxGrau (-1) p
+    where 
+        maxGrau acc (c,e) | c /= 0.0 = max acc e --evita qualquer monomio de coeficiente 0
+                          | otherwise = acc --se for coeficiente 0 é retirado
+
+--c
+--Versão Recursiva
+selgrau :: Int -> Polinomio -> Polinomio
+selgrau _ [] = []
+selgrau q ((x,y):t) =
+    if q == y
+        then (x,y) : selgrau q t
+        else selgrau q t
+--Versão Eficiente
+selgrau1 n = filter (\(_,e) -> e == n)
+
