@@ -203,10 +203,10 @@ conta1 x l = length (filter (\(_, n) -> n == x) l)
 grau :: Polinomio -> Int
 grau [] = 0
 grau [(x,n)] = n
-grau ((x1,n1):(x2,n2):t) = 
+grau ((val,n1):(x2,n2):t) = 
     if n1 < n2 
         then grau ((x2,n2):t)
-        else grau ((x1,n1):t)
+        else grau ((val,n1):t)
 --Versão Eficiente
 grau1 :: Polinomio -> Int
 grau1 p = foldl maxGrau (-1) p
@@ -225,3 +225,90 @@ selgrau q ((x,y):t) =
 --Versão Eficiente
 selgrau1 n = filter (\(_,e) -> e == n)
 
+--d
+--Versão Recursiva
+deriv :: Polinomio -> Polinomio
+deriv ((a,b):t) | b > 0 = (a * fromIntegral b, b-1) : deriv t
+                | otherwise = deriv t
+--Versão Eficiente
+deriv1 :: Polinomio -> Polinomio
+deriv1 p = map (\(x,n) -> (x * fromIntegral n , n - 1)) (filter (\(_,n) -> n > 0) p)
+
+--e
+--Versão Recursiva
+calcula :: Float -> Polinomio -> Float
+calcula val [] = 0
+calcula val ((x,n):t) = x * (val ^ n) + calcula val t
+--Versão Eficiente
+calcula1 :: Float -> Polinomio -> Float
+calcula1 val p = foldl (\acc (x,n) -> acc + (x * (val ^ n))) 0 p
+
+--f
+--Versão Recursiva
+simp :: Polinomio -> Polinomio
+simp [] = []
+simp ((x,n):t) = if x == 0 
+    then simp t
+    else (x,n) : simp t
+--Versão Eficiente
+simp1 :: Polinomio -> Polinomio
+simp1 p = filter (\(x,_) -> x /= 0) p
+
+--g
+--Versão Recursiva
+mult :: Monomio -> Polinomio -> Polinomio
+mult x [] = []
+mult (x,n) ((x1,n1):t) = (x*x1 , n + n1) : mult (x,n) t
+--Versão Eficiente
+mult1 :: Monomio -> Polinomio -> Polinomio
+mult1 (x,n) p = map (\(x1,n1) -> (x * x1 , n + n1)) p
+
+--h e k
+--Versão Recursiva
+normaliza :: Polinomio -> Polinomio
+normaliza p = agrupa (ordena p)
+
+ordena :: Polinomio -> Polinomio
+ordena [] = []
+ordena (h:t) = insere h (ordena t)
+    where 
+        insere x [] = [x]
+        insere (x,n) ((x1,n1):t)
+            | n <= n1 = (x,n) : (x1,n1) : t
+            | otherwise = (x1,n1) : insere (x,n) t
+
+agrupa :: Polinomio -> Polinomio
+agrupa [] = []
+agrupa [x] = [x]
+agrupa ((x1,n1):(x2,n2):t)
+    | n2 == n2 = agrupa ((x1 + x2,n1) : t) --testa novamenta com o resto
+    | otherwise = (x1,n1) : agrupa ((x2,n2):t)
+--Versão Eficiente
+normaliza1 :: Polinomio -> Polinomio
+normaliza1 p = foldl insere [] p
+    where
+        insere [] (x,n) = [(x,n)]
+        insere ((x,n):t) (x1,n1)
+            | n1 == n = (x + x1 , n) : t
+            | otherwise = (x,n) : insere t (x1,n1)
+
+ordena1 :: Polinomio -> Polinomio
+ordena1 p = sortOn snd p
+
+ordena2 p = sortBy (\(_,x) (_,y) -> compare x y) p
+--A partir de agora tens as funções para acabar reutilizando
+--i
+soma :: Polinomio -> Polinomio -> Polinomio
+soma p1 p2 = normaliza (p1 ++ p2)
+
+--j
+produto :: Polinomio -> Polinomio -> Polinomio
+produto [] _ = []
+produto (m:t) p = soma (mult m p) (produto t p)
+--Versão Eficiente
+produto1 :: Polinomio -> Polinomio -> Polinomio
+produto1 p1 p2 = foldl (\acc m -> soma (mult m p2) acc) [] p1
+
+--l
+equiv :: Polinomio -> Polinomio -> Bool
+equiv p1 p2 = (normaliza p1) == (normaliza p2)
