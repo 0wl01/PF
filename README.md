@@ -5,5 +5,5 @@ Elaborada com dupla resposta:
 2: A maneira mais eficiente
 
 Fichas:
-1✔️ (refazer segundo as regras novas)
-2- inicio
+1✔️
+2-✔️
